@@ -1,0 +1,8 @@
+{
+	"Sample_FileName":"Reviews_01012021_120000.csv",
+	"NumberOfColumns":2,
+	"ColumnName":{
+			"comment":"varchar",
+			"label":"varchar"
+		}
+}
