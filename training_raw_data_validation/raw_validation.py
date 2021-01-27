@@ -46,7 +46,7 @@ class Raw_Data_Validation:
             raise e
         return filename, no_of_cols, column_name
 
-    def mainfile_manualRegexCreation(self):
+    def manualRegexCreation(self):
         regex = "['Reviews_']+['\_'']+[\d_]+[\d]+\.csv"
         return regex
 

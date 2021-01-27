@@ -6,6 +6,8 @@ from flask_cors import cross_origin,CORS
 import flask_monitoringdashboard as dashboard
 import json
 import pandas as pd
+from training_validation_insertion import Train_Validation
+from train_model import Training_Model
 
 os.putenv('LANG', 'en_US.UTF-8')
 os.putenv('LC_ALL', 'en_US.UTF-8')
@@ -29,8 +31,14 @@ def trainModelRoute():
                     if request.form['model_list[]'] is not None and request.form['sampler'] is not None:
                         model_list = request.form.getlist('model_list[]')
                         sampling = request.form['sampler']
-                        user_choice_dict = {'model':model_list,'sampling':sampling}
-                        print(user_choice_dict)
+                        training_batch_file_path = 'Training_Batch_Files/'
+
+                        trainValidation_obj = Train_Validation(training_batch_file_path)
+                        trainValidation_obj.training_validation()
+
+                        trainModel_obj = Training_Model(model_list,sampling)
+                        trainModel_obj.train_model()
+
             except ValueError:
                 print(str(ValueError))
                 return Response('Error Occured! %s' % str(ValueError))
@@ -39,7 +47,7 @@ def trainModelRoute():
                 return Response('Error Occured! %s' % str(KeyError))
         else:
             print('None Request Method Passed')
-        return Response(None)
+        return Response('Training Successfully Completed')
     except Exception as e:
         print(e)
         raise e
