@@ -74,7 +74,7 @@ class Training_Model:
                 self.logger_object.log(self.file_object, 'Successfull End of Training')
             else:
                 self.logger_object.log(self.file_object, 'Error while saving model to models directory')
-
+            return is_model_saved
         except Exception as e:
             self.logger_object.log(self.file_object, 'Unsuccessfull End of Training')
             self.file_object.close()

@@ -185,7 +185,9 @@
 						</div>
 					</form>
 					<br>
+					<br>
 					<div class="boxes">
+						<label id="is_trained"></label>
 						<label class="label_heading">Model Evaluation Report</label>
 						<button class="btn btn-warning">Download Evaluation Report as PDF</button>
 					</div>
@@ -282,7 +284,11 @@
 				$.ajax({
 					url : "/trainModel",
 					type : "POST",
-					data: {model_list:model_arr,sampler:sampling}
+					data: {model_list:model_arr,sampler:sampling},
+					success: function(response){
+						$("#is_trained").html(response);
+						$('#loading').hide();
+					}
 				});
 			});
 

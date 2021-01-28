@@ -69,7 +69,7 @@ class Model_Tuner():
                 "max_delta_step": [int(x) for x in np.linspace(start=0, stop=6, num=2)]
             }
 
-            self.random_search_xg = RandomizedSearchCV(estimator=self.xg, param_grid=self.param_grid_xgboost,n_iter=2, cv=2, n_jobs=-1,verbose=100)
+            self.random_search_xg = RandomizedSearchCV(estimator=self.xg, param_distributions=self.param_grid_xgboost,n_iter=2, cv=2, n_jobs=-1,verbose=100)
             self.random_search_xg.fit(train_x, train_y)
 
             self.n_estimators_xg = self.random_search_xg.best_params_['n_estimators']
@@ -83,7 +83,7 @@ class Model_Tuner():
             self.xg = XGBClassifier(objective='multi:softmax', num_class=3 ,n_estimators=self.n_estimators_xg,max_delta_step=self.max_delta_step_xg)
 
             self.xg.fit(train_x, train_y)
-            self.logger_object.log(self.file_object, 'XGBoost best params:' + str(self.grid_xg.best_params_) + 'Exited the best_params_for_XGBoost')
+            self.logger_object.log(self.file_object, 'XGBoost best params:' + str(self.random_search_xg.best_params_) + 'Exited the best_params_for_XGBoost')
 
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed get_params_for_XGBoost() method of Model_Tuner class of best_model_finder package')

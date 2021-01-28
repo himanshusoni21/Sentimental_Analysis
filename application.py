@@ -37,8 +37,9 @@ def trainModelRoute():
                         trainValidation_obj.training_validation()
                         print(type(sampling))
                         trainModel_obj = Training_Model(model_list,sampling)
-                        trainModel_obj.train_model()
-
+                        is_training_success = trainModel_obj.train_model()
+                        if (is_training_success == 'success'):
+                            return Response('Training Successfully Completed !!!')
             except ValueError:
                 print(str(ValueError))
                 return Response('Error Occured! %s' % str(ValueError))
