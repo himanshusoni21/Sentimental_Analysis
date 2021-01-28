@@ -19,18 +19,18 @@ class DB_Operations:
         file.close()
 
         try:
-            self.db_object = self.client[database_name]
-            file = open("TrainingLogs/DataBaseConnectionLog.txt", 'a+')
-            self.logger.log(file, "Database < %s > Created successfully!!" % database_name)
-            self.logger.log(file, "Database Connected successfully!!" % database_name)
+            self.db_object = self.client[str(database_name)]
+            file = open("Training_Logs/DataBaseConnectionLog.txt", 'a+')
+            self.logger.log(file, "Database < %s > Created successfully!!" % str(database_name))
+            self.logger.log(file, "Database < %s > Connected successfully!!" % str(database_name))
             file.close()
 
-            file = open('Training_Logs/General_Log.txt', 'a+')
+            file = open('Training_Logs/DataBaseConnectionLog.txt', 'a+')
             self.logger.log(file,'Successfully Executed create_db_connection() method of DB_Operation class of db_operation package')
             file.close()
             return self.db_object
         except Exception as ex:
-            file = open("Training_Logs/GeneralLog.txt", 'a+')
+            file = open("Training_Logs/General_Log.txt", 'a+')
             self.logger.log(file, 'Error while settingup connection with database.Error :: %s' % ex)
             file.close()
 
@@ -43,7 +43,7 @@ class DB_Operations:
         try:
             collection_list = db_object.collection_names()
             collection_name = 'GoodRawData'
-            file = open("TrainingLogs/DataBaseConnectionLog.txt", 'a+')
+            file = open("Training_Logs/CreateCollectionLog.txt", 'a+')
             if collection_name in collection_list:
                 collection_object = db_object[collection_name]
                 collection_object.remove({})
@@ -58,7 +58,7 @@ class DB_Operations:
             file.close()
             return collection_object
         except Exception as ex:
-            file = open("Training_Logs/GeneralLog.txt", 'a+')
+            file = open("Training_Logs/General_Log.txt", 'a+')
             self.logger.log(file, 'Error while creating collection in database.Error :: %s' % ex)
             file.close()
 
@@ -69,7 +69,7 @@ class DB_Operations:
 
         try:
             only_files = [file for file in os.listdir(self.good_file_path)]
-            file = open("TrainingLogs/DataBaseInsertLog.txt", 'a+')
+            file = open("Training_Logs/DataBaseSelectionLog.txt", 'a+')
             for f in only_files:
                 data = pd.read_csv(os.path.join(self.good_file_path,f))
                 document = [{'comment':rating,'label':label} for rating,label in zip(data['comment'],data['label'])]
@@ -81,7 +81,7 @@ class DB_Operations:
             self.logger.log(file,'Successfully Executed insertion_GoodRawData_into_collection() method of DB_Operation class of db_operation package')
             file.close()
         except Exception as ex:
-            file = open("Training_Logs/GeneralLog.txt", 'a+')
+            file = open("Training_Logs/General_Log.txt", 'a+')
             self.logger.log(file, 'Error while inserting data file into collection.Error :: %s' % ex)
             file.close()
 
@@ -91,6 +91,7 @@ class DB_Operations:
         file.close()
 
         try:
+
             data = list()
             for row in collection_object.find():
                 data.append({'comment':row['comment'],'label':row['label']})
@@ -98,10 +99,10 @@ class DB_Operations:
             if not os.path.isdir(self.FileFromDB):
                 os.makedirs(self.FileFromDB)
 
-            dataframe = pd.DataFrame(data,data[0].keys())
-            dataframe.to_csv(os.path.join(self.FileFromDB,'InputFile.csv'))
+            dataframe = pd.DataFrame(data,columns=['comment','label'])
+            dataframe.to_csv(os.path.join(self.FileFromDB,'InputFile.csv'),index=None)
 
-            file = open("TrainingLogs/DataBase_Into_CSVLog.txt", 'a+')
+            file = open("Training_Logs/DataBase_Into_CSVLog.txt", 'a+')
             self.logger.log(file,'CSV File Exported Successfully !!!')
             file.close()
 
@@ -109,7 +110,7 @@ class DB_Operations:
             self.logger.log(file,'Successfully Executed selectDataFromCollection_into_csv() method of DB_Operation class of db_operation package')
             file.close()
         except Exception as ex:
-            file = open("Training_Logs/GeneralLog.txt", 'a+')
+            file = open("Training_Logs/General_Log.txt", 'a+')
             self.logger.log(file, 'Error while selecting data file and store it as csv.Error :: %s' % ex)
             file.close()
 

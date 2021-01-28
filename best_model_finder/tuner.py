@@ -22,14 +22,14 @@ class Model_Tuner():
         self.logger_object.log(self.file_object, 'Entered the get_best_params_for_random_forest method')
         try:
             self.param_grid = {
-                "n_estimators": [int(x) for x in np.linspace(start=100, stop=1000, num=10)],
+                "n_estimators": [int(x) for x in np.linspace(start=100, stop=100, num=1)],
                 # "criterion" : ['gini','entropy'],
                 # "max_features" : ['auto','sqrt','log2',None],
                 # "max_depth" : [int(x) for x in np.linspace(start=10,stop=16,num=3)],
                 # "min_samples_split" : [int(x) for x in np.linspace(start=1,stop=5,num=3)],
-                "min_samples_leaf": [int(x) for x in np.linspace(start=1, stop=5, num=3)]
+                "min_samples_leaf": [int(x) for x in np.linspace(start=1, stop=2, num=1)]
             }
-            self.random_search_rf = RandomizedSearchCV(estimator=self.rf,n_iter=10,param_distributions=self.param_grid,cv=2,n_jobs=-1,verbose=3)
+            self.random_search_rf = RandomizedSearchCV(estimator=self.rf,n_iter=2,param_distributions=self.param_grid,cv=2,verbose=3)
             self.random_search_rf.fit(x_train,y_train)
 
             # self.criterion = self.random_search.best_params_['criterion']
@@ -60,16 +60,16 @@ class Model_Tuner():
         self.logger_object.log(self.file_object, 'Entered the get_best_params_for_xgboost method')
         try:
             self.param_grid_xgboost = {
-                "n_estimators": [int(x) for x in np.linspace(start=100, stop=1000, num=10)],
+                "n_estimators": [int(x) for x in np.linspace(start=100, stop=100, num=1)],
                 # "booster" : ['gblinear','gbtree','dart'],
                 # "eta" : [0.1,0.5,0.8],
                 # "gamma" : [0,1,2],
                 # "max_depth" : [int(x) for x in np.linspace(start=12,stop=16,num=3)],
                 # "min_child_weight" : [int(x) for x in np.linspace(start=0,stop=9,num=3)],
-                "max_delta_step": [int(x) for x in np.linspace(start=0, stop=9, num=3)]
+                "max_delta_step": [int(x) for x in np.linspace(start=0, stop=6, num=2)]
             }
 
-            self.random_search_xg = RandomizedSearchCV(estimator=self.xg, param_grid=self.param_grid_xgboost,n_iter=10, cv=2, n_jobs=-1,verbose=100)
+            self.random_search_xg = RandomizedSearchCV(estimator=self.xg, param_grid=self.param_grid_xgboost,n_iter=2, cv=2, n_jobs=-1,verbose=100)
             self.random_search_xg.fit(train_x, train_y)
 
             self.n_estimators_xg = self.random_search_xg.best_params_['n_estimators']
@@ -99,12 +99,12 @@ class Model_Tuner():
         file = open('Training_Logs/General_Log.txt', 'a+')
         self.logger_object.log(file,'Entered get_params_for_naive_bayes() method of Model_Tuner class of best_model_finder package')
         file.close()
-
         try:
             self.param_grid = {
-                'var_smoothing':[0.0001,0.00001,0.000001,None]
+                'var_smoothing':[0.0001,0.00001]
             }
-            self.random_search_nb = RandomizedSearchCV(estimator=self.nb,param_distributions=self.param_grid,n_iter=10,cv=2,verbose=3)
+            x_train = x_train.toarray()
+            self.random_search_nb = RandomizedSearchCV(estimator=self.nb,param_distributions=self.param_grid,n_iter=5,cv=2,verbose=3)
             self.random_search_nb.fit(x_train,y_train)
 
             self.var_smoothing = self.random_search_nb.best_params_['var_smoothing']
@@ -120,7 +120,7 @@ class Model_Tuner():
 
             return self.nb
         except Exception as e:
-            self.logger_object.log(self.file_object, 'Exception occured in get_best_params_xgboost :: %s' % (e))
+            self.logger_object.log(self.file_object, 'Exception occured in get_best_params_NaiveBayes :: %s' % (e))
             self.logger_object.log(self.file_object, 'Naive Bayes parameter Tuning Failed,Exited !!')
             raise e
 

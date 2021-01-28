@@ -4,6 +4,7 @@ import re
 import nltk
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from imblearn.under_sampling import NearMiss
 from imblearn.over_sampling import SMOTE
@@ -12,6 +13,7 @@ from nltk.tokenize import word_tokenize
 nltk.download('stopwords')
 nltk.download('wordnet')
 from nltk.corpus import stopwords,wordnet
+from file_operations.file_method_embeddings import File_Operation_Embedding
 
 
 
@@ -45,12 +47,13 @@ class PreProcessor:
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed remove_null() method of PreProcessing class of data_preprocessing package')
             file.close()
-            return self.data2
+            return data
 
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception Occured while performing is_null_present method %s' % str(e))
             self.logger_object.log(self.file_object, 'Removing Null Values Failed due to Exception occured')
             raise e
+
 
     def clean_reviews(self, data):
         file = open('Training_Logs/General_Log.txt', 'a+')
@@ -58,11 +61,14 @@ class PreProcessor:
         file.close()
         self.data = data
         try:
-            self.data = self.data.lower()
-            self.data = re.sub(r'[^\w\s]', ' ', self.data)
-            self.data = re.sub(r'[\d+]', ' ', self.data)
-            self.data = self.data.strip()
-            self.data = re.sub(' +', ' ', self.data)
+            def cleanReviews_regex(x):
+                x = x.lower()
+                x = re.sub('[^\w\s]', ' ', x)
+                x = re.sub('[\d+]', ' ', x)
+                x = x.strip()
+                return x
+
+            self.data['comment'] = self.data['comment'].apply(lambda x:cleanReviews_regex(x))
 
             self.logger_object.log(self.file_object,'Cleaning of review Succesfull!!. Exited to the clean_reviews of the PreProcessor class of data_preprocessing package')
 
@@ -94,13 +100,13 @@ class PreProcessor:
                 if word in self.wanted:
                     self.stop_words.remove(word)
 
-            self.data2 = self.data['comment'].apply(lambda x: " ".join(x for x in x.split() if x not in self.stop_words))
+            self.data['comment'] = self.data['comment'].apply(lambda x: " ".join(x for x in x.split() if x not in self.stop_words))
             self.logger_object.log(self.file_object,'Remove StopWords Succesfull. Exited to the removeStopWords of the Preprocessor class')
 
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed remove_StopWords() method of PreProcessor class of data_preprocessing package')
             file.close()
-            return self.data2
+            return self.data
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in remove_StopWords method of the Preprocessor class. Exception message::  ' + str(e))
             self.logger_object.log(self.file_object,'Remove StopWords Unsuccessful. Exited the removeStopWords method of the Preprocessor class')
@@ -118,41 +124,16 @@ class PreProcessor:
                 translator = str.maketrans('', '', string.punctuation)
                 return text.translate(translator)
 
-            self.data2 = data['comment'].apply(lambda x:remove_punct(x))
+            self.data['comment'] = data['comment'].apply(lambda x:remove_punct(x))
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed remove_punctuations() method of PreProcessor class of data_preprocessing package')
             file.close()
 
-            return self.data2
+            return self.data
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in remove_punctuations() method of the Preprocessor class. Exception message::  ' + str(e))
             self.logger_object.log(self.file_object,'Remove Punctuations Unsuccessful. Exited the remove_punctuations method of the Preprocessor class')
             raise e
-
-    def to_WordNet(pos_tag):
-        if pos_tag.startswith('J'):
-            return wordnet.ADJ
-        elif pos_tag.startswith('V'):
-            return wordnet.VERB
-        elif pos_tag.startswith('N'):
-            return wordnet.NOUN
-        elif pos_tag.startswith('R'):
-            return wordnet.ADV
-        else:
-            return None
-
-    def postagging_lemmatize(self,x):
-        x = word_tokenize(x)
-        pos_tagged = nltk.pos_tag(x)
-        wordnet_tagged = map(lambda x: (x[0], self.to_WordNet(x[1])), pos_tagged)
-        lemm = WordNetLemmatizer()
-        lemmatize_sentence = list()
-        for word, tag in wordnet_tagged:
-            if tag is None:
-                lemmatize_sentence.append(word)
-            else:
-                lemmatize_sentence.append(lemm.lemmatize(word, tag))
-        return lemmatize_sentence
 
     def pos_tagging_lemmatizeText(self,data):
         file = open('Training_Logs/General_Log.txt', 'a+')
@@ -161,11 +142,36 @@ class PreProcessor:
 
         self.data = data
         try:
-            self.data2 = data['comment'].apply(lambda x:self.postagging_lemmatize(x))
+            def to_WordNet(pos_tag):
+                if pos_tag.startswith('J'):
+                    return wordnet.ADJ
+                elif pos_tag.startswith('V'):
+                    return wordnet.VERB
+                elif pos_tag.startswith('N'):
+                    return wordnet.NOUN
+                elif pos_tag.startswith('R'):
+                    return wordnet.ADV
+                else:
+                    return None
+
+            def postagging_lemmatize(x):
+                x = word_tokenize(x)
+                pos_tagged = nltk.pos_tag(x)
+                wordnet_tagged = map(lambda x: (x[0], to_WordNet(x[1])), pos_tagged)
+                lemm = WordNetLemmatizer()
+                lemmatize_sentence = list()
+                for word, tag in wordnet_tagged:
+                    if tag is None:
+                        lemmatize_sentence.append(word)
+                    else:
+                        lemmatize_sentence.append(lemm.lemmatize(word, tag))
+                return str(lemmatize_sentence)
+
+            self.data['comment'] = data['comment'].apply(lambda x:postagging_lemmatize(x))
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed pos_tagging_lemmatizeText() method of PreProcessor class of data_preprocessing package')
             file.close()
-            return self.data2
+            return self.data
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in pos_tagging_lemmatizeText() method of the Preprocessor class. Exception message::  ' + str(e))
             self.logger_object.log(self.file_object,'Remove Punctuations Unsuccessful. Exited the pos_tagging_lemmatizeText method of the Preprocessor class')
@@ -203,17 +209,49 @@ class PreProcessor:
         self.x_test = x_test
         try:
             cv = CountVectorizer(ngram_range=(2,2))
-            self.x_train = cv.fit_transform(x_train)
-            self.x_test = cv.transform(x_test)
+            self.x_train = cv.fit_transform(self.x_train)
+            self.x_test = cv.transform(self.x_test)
+
+            file_op = File_Operation_Embedding(self.file_object,self.logger_object)
+            if(file_op.save_model(cv,'CountVectorizer')):
+                self.logger_object.log(self.file_object,'CountVectorizer Object saved Successfully')
+            else:
+                self.logger_object.log(self.file_object,'Error while saving CountVectorizer Object')
 
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed count_vectorizer() method of PreProcessor class of data_preprocessing package')
             file.close()
 
-            return x_train,x_test
+            return self.x_train,self.x_test
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in count_vectorizer() method of the Preprocessor class. Exception message:  ' + str(e))
             self.logger_object.log(self.file_object,'Count Vectorizer Unsuccessful. Exited the count_vectorizer() method of the Preprocessor class')
+            raise Exception()
+
+    def tfidf_vectorizer(self,x_train,x_test):
+        file = open('Training_Logs/General_Log.txt', 'a+')
+        self.logger_object.log(file,'Entered tfidf_vectorizer() method of PreProcessor class of data_preprocessing package')
+        file.close()
+
+        self.x_train = x_train
+        self.x_test = x_test
+        try:
+            tfidf = TfidfVectorizer(ngram_range=(2,2))
+            self.x_train = tfidf.fit_transform(self.x_train)
+            self.x_test = tfidf.transform(self.x_test)
+
+            file_op = File_Operation_Embedding(self.file_object, self.logger_object)
+            if (file_op.save_model(tfidf, 'TfidfVectorizer')):
+                self.logger_object.log(self.file_object, 'TfidfVectorizer Object saved Successfully')
+
+            file = open('Training_Logs/General_Log.txt', 'a+')
+            self.logger_object.log(file,'Successfully Executed tfidf_vectorizer() method of PreProcessor class of data_preprocessing package')
+            file.close()
+
+            return x_train,x_test
+        except Exception as e:
+            self.logger_object.log(self.file_object,'Exception occured in tfidf_vectorizer() method of the Preprocessor class. Exception message:  ' + str(e))
+            self.logger_object.log(self.file_object,'Tfidf Vectorizer Unsuccessful. Exited the tfidfTransformer_vectorizer() method of the Preprocessor class')
             raise Exception()
 
     def tfidfTransformer_vectorizer(self,x_train,x_test):
@@ -225,14 +263,18 @@ class PreProcessor:
         self.x_test = x_test
         try:
             tfidf = TfidfTransformer()
-            self.x_train = tfidf.fit_transform(x_train)
-            self.x_test = tfidf.transform(x_test)
+            self.x_train = tfidf.fit_transform(self.x_train)
+            self.x_test = tfidf.transform(self.x_test)
+
+            file_op = File_Operation_Embedding(self.file_object, self.logger_object)
+            if (file_op.save_model(tfidf, 'TfidfTransformerVectorizer')):
+                self.logger_object.log(self.file_object, 'TfidfTransformerVectorizer Object saved Successfully')
 
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed tfidfTransformer_vectorizer() method of PreProcessor class of data_preprocessing package')
             file.close()
 
-            return x_train,x_test
+            return self.x_train,self.x_test
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in tfidfTransformer_vectorizer() method of the Preprocessor class. Exception message:  ' + str(e))
             self.logger_object.log(self.file_object,'Count Vectorizer Unsuccessful. Exited the tfidfTransformer_vectorizer() method of the Preprocessor class')
@@ -304,8 +346,8 @@ class PreProcessor:
 
         self.data = data
         try:
-            self.x = self.data['Comment']
-            self.y = self.data['Label']
+            self.x = self.data['comment']
+            self.y = self.data['label']
 
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed separate_feature_label() method of PreProcessor class of data_preprocessing package')

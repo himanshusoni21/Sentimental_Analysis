@@ -32,6 +32,7 @@ class Training_Model:
             x,y = preprocessor.separate_feature_label(data)
             x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.3,random_state=100)
             x_train,x_test = preprocessor.count_vectorizer(x_train,x_test)
+            #x_train,x_test = preprocessor.tfidf_vectorizer(x_train,x_test)
             x_train,x_test = preprocessor.tfidfTransformer_vectorizer(x_train,x_test)
 
             if self.sampling_method == 'us':
@@ -63,11 +64,11 @@ class Training_Model:
             self.ordered_model_evaluation_report_dict = sorted(self.model_evaluation_report_dict.items(),key=lambda x:x[1]['f1_score'],reverse=True)
 
             for m in self.ordered_model_evaluation_report_dict:
-                model_to_save = m
+                model_to_save = m[0]
                 break;
 
             file_operation = File_Operation(self.file_object,self.logger_object)
-            is_model_saved = file_operation.save_model(self.trained_models_dict[m],m)
+            is_model_saved = file_operation.save_model(self.trained_models_dict[model_to_save],model_to_save)
 
             if (is_model_saved == 'success'):
                 self.logger_object.log(self.file_object, 'Successfull End of Training')

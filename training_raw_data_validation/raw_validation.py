@@ -113,7 +113,7 @@ class Raw_Data_Validation:
             raise OSError
 
     def moveBadFilesToArchiveBad(self):
-        file = open('Training_Logs/GeneralLog.txt', 'a+')
+        file = open('Training_Logs/General_Log.txt', 'a+')
         self.logger.log(file,'Entered moveBadFilesTOArchiveBad() method of Raw_Data_Validation class of training_raw_data_validation package')
         file.close()
         now = datetime.now()
@@ -133,7 +133,7 @@ class Raw_Data_Validation:
                 for f in files:
                     if f not in os.listdir(dest):
                         shutil.move(source + f, dest)
-                file = open("Training_Logs/GeneralLog.txt", 'a+')
+                file = open("Training_Logs/General_Log.txt", 'a+')
                 self.logger.log(file,'Bad files moved to archive')
                 path = 'Training_Raw_files_validated/'
                 if os.path.isdir(path + 'Bad_Raw/'):
@@ -142,13 +142,13 @@ class Raw_Data_Validation:
                 self.logger.log(file,'Successfully Executed moveBadFilesToArchiveBad() method of Raw_Data_Validation class of training_raw_data_validation package')
                 file.close()
         except Exception as e:
-            file = open("Training_Logs/GeneralLog.txt", 'a+')
+            file = open("Training_Logs/General_Log.txt", 'a+')
             self.logger.log(file, "Error while moving bad files to archive:: %s" % e)
             file.close()
             raise e
 
     def validateColumnLength(self,NumberofColumns):
-        file = open('Training_Logs/GeneralLog.txt', 'a+')
+        file = open('Training_Logs/General_Log.txt', 'a+')
         self.logger.log(file,'Entered validateColumnLength() method of Raw_Data_Validation class of training_raw_data_validation package')
         file.close()
         self.deleteExistingBadDataTrainingDir()
@@ -157,12 +157,12 @@ class Raw_Data_Validation:
         try:
             f = open("Training_Logs/columnValidationLog.txt", 'a+')
             self.logger.log(f,"Column Length Validation Started!!")
-            for file in os.listdir('Training_Raw_Validated_File/Good_Raw/'):
-                csv = pd.read_csv("Training_Raw_files_validated/Good_Raw/" + file)
+            for file in os.listdir('Training_Batch_Files'):
+                csv = pd.read_csv("Training_Batch_Files/" + file)
                 if csv.shape[1] == NumberofColumns:
-                    pass
+                    shutil.copy("Training_Batch_Files/" + file,"Training_Raw_Validated_File/Good_Raw")
                 else:
-                    shutil.move("Training_Raw_Validated_File/Good_Raw/" + file, "Training_Raw_Validated_File/Bad_Raw")
+                    shutil.copy("Training_Batch_Files/" + file, "Training_Raw_Validated_File/Bad_Raw")
                     self.logger.log(f, "Invalid Column Length for the file!! File moved to Bad Raw Folder :: %s" % file)
             self.logger.log(f, "Column Length Validation Completed!!")
 

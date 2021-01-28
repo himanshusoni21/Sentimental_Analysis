@@ -29,10 +29,10 @@ class File_Operation:
             else:
                 os.makedirs(path)
 
-            with open(path + '/' + filename + '.sav','wb') as f:
+            with open(path + '/' + full_filename + '.sav','wb') as f:
                 pickle.dump(model,f)
 
-            self.logger_object.log(file,'Model File : ' + filename + ' Saved.')
+            self.logger_object.log(open('Training_Logs/ModelTrainingLog.txt'),'Model File : ' + full_filename + ' Saved.')
             self.logger_object.log(file,'Successfully Executed save_model() method of file_operations class of file_operation package')
             file.close()
             return 'success'

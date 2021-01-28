@@ -2,7 +2,7 @@ import pandas as pd
 
 class Data_Getter:
     def __init__(self,file_object,log_object):
-        self.training_file ='TrainingFileFromDB/InputFile.csv'
+        self.training_file ='TrainingFileFrom_DB/InputFile.csv'
         self.file_object = file_object
         self.logger_object = log_object
 

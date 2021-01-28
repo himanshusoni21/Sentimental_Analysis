@@ -35,7 +35,7 @@ def trainModelRoute():
 
                         trainValidation_obj = Train_Validation(training_batch_file_path)
                         trainValidation_obj.training_validation()
-
+                        print(type(sampling))
                         trainModel_obj = Training_Model(model_list,sampling)
                         trainModel_obj.train_model()
 

@@ -11,13 +11,13 @@ class Model_Evaluation:
         self.file_object = file_object
         self.model_evaluation_dict = {
             'nb': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
-                   'f1_score': None},
+                   'f1_score': 0},
             'rf': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
-                   'f1_score': None},
+                   'f1_score': 0},
             'xg': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
-                   'f1_score': None},
+                   'f1_score': 0},
             'bnb': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
-                    'f1_score': None}
+                    'f1_score': 0}
         }
 
 
@@ -63,7 +63,7 @@ class Model_Evaluation:
 
         try:
             y_predict = model.predict(self.x_test)
-            prec_score = precision_score(self.y_test,y_predict)
+            prec_score = precision_score(self.y_test,y_predict,average='micro')
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed get_precision_score() for ' +str(model)+ ' method of Model_Tuner class of best_model_finder package')
             file.close()
@@ -80,7 +80,7 @@ class Model_Evaluation:
 
         try:
             y_predict = model.predict(self.x_test)
-            reca_score = recall_score(self.y_test,y_predict)
+            reca_score = recall_score(self.y_test,y_predict,average='micro')
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed get_recall_score for ' +str(model)+ ' method of Model_Finder class of best_model_finder package')
             file.close()
@@ -97,7 +97,7 @@ class Model_Evaluation:
 
         try:
             y_predict = model.predict(self.x_test)
-            f1_sc = f1_score(self.y_test,y_predict)
+            f1_sc = f1_score(self.y_test,y_predict,average='micro')
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed get_f1_score for ' +str(model)+ ' method of Model_Finder class of best_model_finder package')
             file.close()
@@ -118,6 +118,7 @@ class Model_Evaluation:
                     self.model_evaluation_dict[model]['accuracy_score'] = self.get_accuracy_score(object)
                     self.model_evaluation_dict[model]['confusion_matrix'] = self.get_confusion_matrix(object)
                     self.model_evaluation_dict[model]['precision_score'] = self.get_precision_score(object)
+                    self.model_evaluation_dict[model]['recall_score'] = self.get_recall_score(object)
                     self.model_evaluation_dict[model]['f1_score'] = self.get_f1_score(object)
 
             file = open('Training_Logs/General_Log.txt', 'a+')
@@ -128,7 +129,7 @@ class Model_Evaluation:
             return self.model_evaluation_dict
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception Occured in generate_model_evaluation_report_dict() ')
-            self.logger_object.log(self.file_object, 'get_f1_score() method .Exited !!')
+            self.logger_object.log(self.file_object, 'generate_models_evaluation_report_dict() method .Exited !!')
             raise e
 
 

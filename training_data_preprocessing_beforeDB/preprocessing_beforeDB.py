@@ -4,8 +4,7 @@ from application_logging.logger import App_Logger
 
 class preprocessing_beforeDB:
     def __init__(self):
-        self.goodData_MainFile_path = "Training_Raw_Validated_File/Good_Raw_MainFile"
-        self.goodData_AdditionalFile_path = "Training_Raw_Validated_File/Good_Raw_AdditionalFile"
+        self.goodData_path = "Training_Raw_Validated_File/Good_Raw"
         self.logger = App_Logger()
 
     def replaceMissingWithNull(self):
@@ -14,11 +13,11 @@ class preprocessing_beforeDB:
         file.close()
         try:
             f = open("Training_Logs/data_preprocessing_beforeDB.txt", "a+")
-            only_files = [f for f in os.listdir(self.goodData_MainFile_path)]
+            only_files = [f for f in os.listdir(self.goodData_path)]
             for file in only_files:
-                csv = pd.read_csv(self.goodData_MainFile_path + "/" + file)
+                csv = pd.read_csv(self.goodData_path + "/" + file)
                 csv.fillna('NULL',inplace=True)
-                csv.to_csv(self.goodData_MainFile_path + "/" + file,index=None,header=True)
+                csv.to_csv(self.goodData_path + "/" + file,index=None,header=True)
                 self.logger.log(f,'Replace Missing values with Null Values in Good Raw Main File Successfully !!')
             f.close()
 
