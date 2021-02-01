@@ -1,5 +1,5 @@
 from training_raw_data_validation.raw_validation import Raw_Data_Validation
-from db_operations.db_operations import DB_Operations
+from training_db_operations.db_operations import DB_Operations
 from training_data_preprocessing_beforeDB.preprocessing_beforeDB import preprocessing_beforeDB
 from application_logging.logger import App_Logger
 

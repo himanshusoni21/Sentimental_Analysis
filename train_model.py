@@ -45,11 +45,11 @@ class Training_Model:
                 pass
 
             tuner = Model_Tuner(self.file_object,self.logger_object)
-            self.trained_models_dict = {'nb':None,'rf':None,'xg':None,'bnb':None}
+            self.trained_models_dict = {'svm':None,'rf':None,'xg':None,'bnb':None}
 
             for m in self.models_list:
-                if m == 'nb':
-                    self.trained_models_dict['nb'] = tuner.get_params_naive_bayes(x_train,y_train)
+                if m == 'svm':
+                    self.trained_models_dict['nb'] = tuner.get_params_svm(x_train,y_train)
                 elif m == 'rf':
                     self.trained_models_dict['rf'] = tuner.get_params_for_RandomForest(x_train,y_train)
                 elif m == 'xg':

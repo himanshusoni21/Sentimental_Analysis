@@ -10,7 +10,7 @@ class Model_Evaluation:
         self.logger_object = logger_object
         self.file_object = file_object
         self.model_evaluation_dict = {
-            'nb': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
+            'svm': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
                    'f1_score': 0},
             'rf': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
                    'f1_score': 0},

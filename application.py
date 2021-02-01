@@ -1,12 +1,10 @@
 from wsgiref import simple_server
 from flask import Flask,render_template,request,Response,send_file
 import os
-import shutil
 from flask_cors import cross_origin,CORS
 import flask_monitoringdashboard as dashboard
-import json
-import pandas as pd
 from training_validation_insertion import Train_Validation
+from prediction_validation_insertion import Predict_Validation
 from train_model import Training_Model
 
 os.putenv('LANG', 'en_US.UTF-8')
@@ -66,6 +64,12 @@ def predictBatchRoute():
                     #print(batchFiles)
                     for file in batchFiles:
                         file.save('Prediction_Batch_Files/' + file.filename)
+
+                    prediction_batch_file_path = 'Prediction_Batch_Files'
+                    listoffile_predict = [f for f in os.listdir(prediction_batch_file_path)]
+                    predictionValidation_obj = Predict_Validation(prediction_batch_file_path,listoffile_predict)
+                    predictionValidation_obj.prediction_validation()
+
             except Exception as e:
                 print(e)
                 raise e
