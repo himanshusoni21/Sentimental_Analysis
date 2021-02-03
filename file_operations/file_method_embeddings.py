@@ -32,16 +32,15 @@ class File_Operation_Embedding:
             self.logger_object.log(self.file_object,'Embedding File could not be saved')
             raise e
 
-    def load_model(self,filename_list):
-        file = open('Training_Logs/General_Log.txt', 'a+')
+    def load_model(self,embedding_type):
+        file = open('Prediction_Logs/General_Log.txt', 'a+')
         self.logger_object.log(file, 'Entered load_model() method of file_operations_embedding class of file_operations package')
         try:
-            for i in filename_list:
-                with open(self.embedding_dir + i + '/' + i + '.pkl','rb') as f:
-                    self.logger_object.log(self.file_object,'Embedding File' + f + 'Loaded Successfully')
-                    return pickle.load(f)
+            with open(self.embedding_dir + embedding_type + '/' + embedding_type + '.pkl','rb') as f:
+                self.logger_object.log(self.file_object,'Embedding File' + f + 'Loaded Successfully')
+                return pickle.load(f)
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in load model method of model finder class:: %s' %str(e))
-            self.logger_object.log(self.file_object,'Embedding File ' + filename_list + ' could not be loaded ')
+            self.logger_object.log(self.file_object,'Embedding File ' + embedding_type + ' could not be loaded ')
             raise e
 

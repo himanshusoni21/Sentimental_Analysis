@@ -6,6 +6,7 @@ import flask_monitoringdashboard as dashboard
 from training_validation_insertion import Train_Validation
 from prediction_validation_insertion import Predict_Validation
 from train_model import Training_Model
+from predict_model import Predict_From_Model
 
 os.putenv('LANG', 'en_US.UTF-8')
 os.putenv('LC_ALL', 'en_US.UTF-8')
@@ -70,6 +71,12 @@ def predictBatchRoute():
                     predictionValidation_obj = Predict_Validation(prediction_batch_file_path,listoffile_predict)
                     predictionValidation_obj.prediction_validation()
 
+                    prediction_obj = Predict_From_Model()
+                    response = prediction_obj.predict_model()
+                    if response == 1:
+                        return Response('Bulk Batch Prediction Completed Successfully !!!')
+                    else:
+                        return Response('Error while doing Bulk Batch Prediction !!!')
             except Exception as e:
                 print(e)
                 raise e
