@@ -19,6 +19,10 @@ class Predict_Validation:
             self.raw_data.deleteExistingBadDataTrainingDir()
             self.raw_data.deleteExistingGoodDataTrainingDir()
             self.raw_data.createDirectoryFor_GoodBadRawData()
+            # self.raw_data.deleteExisting_PredictedFiles()
+            # self.raw_data.deleteExisting_Prediction_Batch_Files()
+            # self.raw_data.deleteExisting_PredictionFileTo_Predict()
+            # self.raw_data.deleteExisting_Prediction_Logs()
             for f in self.listoffile_predict:
             #regex = self.raw_data.manualRegexCreation()
                 self.raw_data.validateColumnLength(f,no_of_cols)

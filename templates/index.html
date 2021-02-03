@@ -206,9 +206,9 @@
 						<form id="singlePredict" method="post">
 							<label class="label_heading"><u>Single Row Predict Section</u></label>
 							<div class="form-group files color">
-								<textarea class="form-control" placeholder="Enter Review Comment"></textarea>
+								<textarea class="form-control" id="comment" placeholder="Enter Review Comment"></textarea>
 								<br>
-								<input type="submit" class="btn btn-danger" value="Row Predict">
+								<input type="button" id="row_predict" class="btn btn-danger" value="Row Predict">
 							</div>
 						</form>
 					</div>
@@ -317,6 +317,26 @@
 						$('#loading').hide();
 					}
 				});
+			});
+
+			$('#row_predict').click(function(e){
+				e.preventDefault();
+				$('#loading').show();
+
+				var comment = $('#comment').val();
+
+				$.ajax({
+					//change url below
+					url : "/predictRow",
+					type: "POST",
+					data: {comment:comment},
+					success: function(response){
+						$(".json-result").html("<p>Prediction is:" + response + "</p>");
+						$('#loading').hide();
+					}
+				});
+
+
 
 			});
 		});

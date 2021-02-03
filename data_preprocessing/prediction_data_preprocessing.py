@@ -2,12 +2,6 @@ import string
 import pandas as pd
 import re
 import nltk
-from sklearn.preprocessing import LabelEncoder
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
-from imblearn.under_sampling import NearMiss
-from imblearn.over_sampling import SMOTE
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 nltk.download('stopwords')
@@ -223,32 +217,6 @@ class PreProcessor_Prediction:
             self.logger_object.log(self.file_object,'Count Vectorizer Unsuccessful. Exited the count_vectorizer() method of the PreProcessor_Prediction class')
             raise Exception()
 
-    def tfidf_vectorizer(self,x_train,x_test):
-        file = open('Prediction_Logs/General_Log.txt', 'a+')
-        self.logger_object.log(file,'Entered tfidf_vectorizer() method of PreProcessor_Prediction class of data_preprocessing package')
-        file.close()
-
-        self.x_train = x_train
-        self.x_test = x_test
-        try:
-            tfidf = TfidfVectorizer(ngram_range=(2,2))
-            self.x_train = tfidf.fit_transform(self.x_train)
-            self.x_test = tfidf.transform(self.x_test)
-
-            file_op = File_Operation_Embedding(self.file_object, self.logger_object)
-            if (file_op.save_model(tfidf, 'TfidfVectorizer')):
-                self.logger_object.log(self.file_object, 'TfidfVectorizer Object saved Successfully')
-
-            file = open('Prediction_Logs/General_Log.txt', 'a+')
-            self.logger_object.log(file,'Successfully Executed tfidf_vectorizer() method of PreProcessor_Prediction class of data_preprocessing package')
-            file.close()
-
-            return x_train,x_test
-        except Exception as e:
-            self.logger_object.log(self.file_object,'Exception occured in tfidf_vectorizer() method of the PreProcessor_Prediction class. Exception message:  ' + str(e))
-            self.logger_object.log(self.file_object,'Tfidf Vectorizer Unsuccessful. Exited the tfidfTransformer_vectorizer() method of the PreProcessor_Prediction class')
-            raise Exception()
-
     def tfidfTransformer_vectorizer(self,data):
         file = open('Prediction_Logs/General_Log.txt', 'a+')
         self.logger_object.log(file,'Entered tfidfTransformer_vectorizer() method of PreProcessor_Prediction class of data_preprocessing package')
@@ -257,7 +225,7 @@ class PreProcessor_Prediction:
         try:
             file_op = File_Operation_Embedding(self.file_object, self.logger_object)
             tfidf_obj = file_op.load_model('TfidfTransformerVectorizer')
-            self.data = tfidf_obj.transform(self.data['comment'])
+            self.data = tfidf_obj.transform(self.data)
 
             if (tfidf_obj is not None):
                 self.logger_object.log(self.file_object, 'TfidfTransformerVectorizer Object load Successfully')
@@ -271,5 +239,5 @@ class PreProcessor_Prediction:
             return data
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in tfidfTransformer_vectorizer() method of the PreProcessor_Prediction class. Exception message:  ' + str(e))
-            self.logger_object.log(self.file_object,'Count Vectorizer Unsuccessful. Exited the tfidfTransformer_vectorizer() method of the PreProcessor_Prediction class')
+            self.logger_object.log(self.file_object,'TfidfTransformer Unsuccessful. Exited the tfidfTransformer_vectorizer() method of the PreProcessor_Prediction class')
             raise Exception()

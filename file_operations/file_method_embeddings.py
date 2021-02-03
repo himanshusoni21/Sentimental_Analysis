@@ -37,7 +37,7 @@ class File_Operation_Embedding:
         self.logger_object.log(file, 'Entered load_model() method of file_operations_embedding class of file_operations package')
         try:
             with open(self.embedding_dir + embedding_type + '/' + embedding_type + '.pkl','rb') as f:
-                self.logger_object.log(self.file_object,'Embedding File' + f + 'Loaded Successfully')
+                self.logger_object.log(self.file_object,'Embedding File' + embedding_type + 'Loaded Successfully')
                 return pickle.load(f)
         except Exception as e:
             self.logger_object.log(self.file_object,'Exception occured in load model method of model finder class:: %s' %str(e))

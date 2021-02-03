@@ -7,6 +7,7 @@ from training_validation_insertion import Train_Validation
 from prediction_validation_insertion import Predict_Validation
 from train_model import Training_Model
 from predict_model import Predict_From_Model
+import shutil
 
 os.putenv('LANG', 'en_US.UTF-8')
 os.putenv('LC_ALL', 'en_US.UTF-8')
@@ -61,6 +62,39 @@ def predictBatchRoute():
             #print(request.files)
             try:
                 if 'batchfile[]' in request.files:
+
+                    if os.path.exists('Prediction_Logs'):
+                        file = os.listdir('Prediction_Logs')
+                        if not len(file) == 0:
+                            for f in file:
+                                os.remove('Prediction_Logs/' + f)
+                    else:
+                        pass
+
+                    if os.path.exists('Predicted_Files'):
+                        file = os.listdir('Predicted_Files')
+                        if not len(file) == 0:
+                            for f in file:
+                                os.remove('Predicted_Files/' + f)
+                    else:
+                        pass
+
+                    if os.path.exists('Prediction_Batch_Files'):
+                        file = os.listdir('Prediction_Batch_Files')
+                        if not len(file) == 0:
+                            for f in file:
+                                os.remove('Prediction_Batch_Files/' + f)
+                    else:
+                        pass
+
+                    if os.path.exists('PredictionFileTo_Predict'):
+                        file = os.listdir('PredictionFileTo_Predict')
+                        if not len(file) == 0:
+                            for f in file:
+                                os.remove('PredictionFileTo_Predict/' + f)
+                    else:
+                        pass
+
                     batchFiles = request.files.getlist("batchfile[]")
                     #print(batchFiles)
                     for file in batchFiles:
@@ -84,7 +118,23 @@ def predictBatchRoute():
     except Exception as e:
         print(e)
         return Response('Error Occured::%s'%str(e))
-        raise e
+
+
+@application.route("/predictRow",methods=['POST'])
+@cross_origin()
+def predictBatchRoute():
+    try:
+        if request.method == 'POST':
+            try:
+                if request.form is not None:
+                    if request.form['comment'] is not None:
+                        comment = request.form['comment']
+
+            except Exception as e:
+                raise e
+    except Exception as e:
+        print(e)
+        return Response('Error Occured::%s' % str(e))
 
 if __name__ == '__main__':
     host = '0.0.0.0'
