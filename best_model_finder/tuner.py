@@ -99,35 +99,35 @@ class Model_Tuner():
 
     def get_params_svm(self,x_train,y_train):
         file = open('Training_Logs/General_Log.txt', 'a+')
-        self.logger_object.log(file,'Entered get_params_for_naive_bayes() method of Model_Tuner class of best_model_finder package')
+        self.logger_object.log(file,'Entered get_params_for_svm() method of Model_Tuner class of best_model_finder package')
         file.close()
         try:
-            self.param_grid = {
-                'C': [0.1],
-                'gamma': [0.1],
-                'kernel': ['rbf']
-            }
-            x_train = x_train.toarray()
-            self.random_search_svm = RandomizedSearchCV(estimator=self.svm,param_distributions=self.param_grid,n_iter=5,cv=2,verbose=3)
-            self.random_search_svm.fit(x_train,y_train)
-
-            self.c = self.random_search_svm.best_params_['C']
-            self.gamma = self.random_search_svm.best_params_['gamma']
-            self.kernel =  self.random_search_svm.best_params_['kernel']
-
-            self.svm = SVC(C=self.c,gamma=self.gamma,kernel=self.kernel)
+            # self.param_grid = {
+            #     'C': [0.1],
+            #     'gamma': [0.1],
+            #     'kernel': ['rbf']
+            # }
+            # x_train = x_train.toarray()
+            # self.random_search_svm = RandomizedSearchCV(estimator=self.svm,param_distributions=self.param_grid,n_iter=5,cv=2,verbose=3)
+            # self.random_search_svm.fit(x_train,y_train)
+            #
+            # self.c = self.random_search_svm.best_params_['C']
+            # self.gamma = self.random_search_svm.best_params_['gamma']
+            # self.kernel =  self.random_search_svm.best_params_['kernel']
+            # C=self.c,gamma=self.gamma,kernel=self.kernel
+            self.svm = SVC(kernel='rbf')
             self.svm.fit(x_train,y_train)
 
-            self.logger_object.log(self.file_object,'Naive Bayes best params:' + str(self.random_search_svm.best_params_) + 'Exited the best_params_for_NaiveBayes')
+            #self.logger_object.log(self.file_object,'SVM best params:' + str(self.random_search_svm.best_params_) + 'Exited the best_params_for_SVM')
 
             file = open('Training_Logs/General_Log.txt', 'a+')
-            self.logger_object.log(file,'Successfully Executed get_params_for_NaiveBayes() method of Model_Tuner class of best_model_finder package')
+            self.logger_object.log(file,'Successfully Executed get_params_for_SVM() method of Model_Tuner class of best_model_finder package')
             file.close()
 
             return self.svm
         except Exception as e:
-            self.logger_object.log(self.file_object, 'Exception occured in get_best_params_NaiveBayes :: %s' % (e))
-            self.logger_object.log(self.file_object, 'Naive Bayes parameter Tuning Failed,Exited !!')
+            self.logger_object.log(self.file_object, 'Exception occured in get_best_params_SVM :: %s' % (e))
+            self.logger_object.log(self.file_object, 'SVM parameter Tuning Failed,Exited !!')
             raise e
 
 
@@ -137,24 +137,24 @@ class Model_Tuner():
         file.close()
 
         try:
-            self.param_grid = {
-                'var_smoothing':[0.0001,0.00001,0.000001,None]
-            }
-            self.random_search_bnb = RandomizedSearchCV(estimator=BaggingClassifier(MultinomialNB,n_estimators=10),param_distributions=self.param_grid,n_iter=10,cv=2,verbose=3)
-            self.random_search_bnb.fit(x_train,y_train)
+            # self.param_grid = {
+            #     'var_smoothing':[0.0001,0.00001,0.000001,None]
+            # }
+            # self.random_search_bnb = RandomizedSearchCV(estimator=BaggingClassifier(MultinomialNB,n_estimators=10),param_distributions=self.param_grid,n_iter=10,cv=2,verbose=3)
+            # self.random_search_bnb.fit(x_train,y_train)
+            #
+            # self.var_smoothing = self.random_search_bnb.best_params_['var_smoothing']
 
-            self.var_smoothing = self.random_search_bnb.best_params_['var_smoothing']
+            self.mnb = BaggingClassifier(base_estimator=MultinomialNB(),n_estimators=10)
+            self.mnb.fit(x_train,y_train)
 
-            self.bnb = BaggingClassifier(base_estimator=MultinomialNB(var_smoothing=self.var_smoothing),n_estimators=10)
-            self.bnb.fit(x_train,y_train)
-
-            self.logger_object.log(self.file_object,'Bagging Naive Bayes best params:' + str(self.random_search_bnb.best_params_) + 'Exited the best_params_for_BaggingNaiveBayes')
+            #self.logger_object.log(self.file_object,'Bagging Naive Bayes best params:' + str(self.random_search_bnb.best_params_) + 'Exited the best_params_for_BaggingNaiveBayes')
 
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file,'Successfully Executed get_params_for_BaggingNaiveBayes() method of Model_Tuner class of best_model_finder package')
             file.close()
 
-            return self.bnb
+            return self.mnb
         except Exception as e:
             self.logger_object.log(self.file_object, 'Exception occured in get_best_params_bagging_Naive_Bayes :: %s' % (e))
             self.logger_object.log(self.file_object, 'Bagging Naive Bayes parameter Tuning Failed,Exited !!')

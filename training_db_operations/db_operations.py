@@ -91,7 +91,6 @@ class DB_Operations:
         file.close()
 
         try:
-
             data = list()
             for row in collection_object.find():
                 data.append({'comment':row['comment'],'label':row['label']})
@@ -100,7 +99,7 @@ class DB_Operations:
                 os.makedirs(self.FileFromDB)
 
             dataframe = pd.DataFrame(data,columns=['comment','label'])
-            dataframe.to_csv(os.path.join(self.FileFromDB,'InputFile.csv'),index=None)
+            dataframe.to_csv(os.path.join(self.FileFromDB,'InputFile.csv'),index=False)
 
             file = open("Training_Logs/DataBase_Into_CSVLog.txt", 'a+')
             self.logger.log(file,'CSV File Exported Successfully !!!')

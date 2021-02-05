@@ -14,7 +14,7 @@ class Predict_From_Model:
 
     def predict_model(self):
         file = open('Prediction_Logs/General_Log.txt', 'a+')
-        self.logger_object.log(file,'Entered train_model() method of Training_Model class')
+        self.logger_object.log(file,'Entered predict_model() method of Predict_Model class')
         file.close()
 
         try:
@@ -47,6 +47,35 @@ class Predict_From_Model:
             self.file_object.close()
             raise e
 
+
+
+    def row_predict_model(self,data):
+        file = open('Prediction_Logs/General_Log.txt', 'a+')
+        self.logger_object.log(file, 'Entered row_predict_model() method of Predict_Model class')
+        file.close()
+
+        try:
+            preprocessor = PreProcessor_Prediction(self.file_object, self.logger_object)
+            data = preprocessor.remove_null(data)
+            data = preprocessor.clean_reviews(data)
+            data = preprocessor.remove_StopWords(data)
+            data = preprocessor.remove_punctuations(data)
+            data = preprocessor.pos_tagging_lemmatizeText(data)
+            data = preprocessor.count_vectorizer(data)
+            data = preprocessor.tfidfTransformer_vectorizer(data)
+
+            file_op = File_Operation(self.file_object, self.logger_object)
+            model_name = file_op.find_correct_model_file()
+            model_obj = file_op.load_model(model_name)
+            prediction = list(model_obj.predict(data))
+            polar_label = self.find_polar_prediction(prediction)[0]
+            return polar_label
+        except Exception as e:
+            self.logger_object.log(self.file_object, 'Unsuccessfull End of Row Prediction !!!')
+            self.file_object.close()
+            raise e
+
+
     def find_polar_prediction(self,pred_list):
         polar = list()
         for i in pred_list:
@@ -57,5 +86,6 @@ class Predict_From_Model:
             elif i == 0:
                 polar.append('Negative')
         return polar
+
 
 

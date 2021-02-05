@@ -45,17 +45,17 @@ class Training_Model:
                 pass
 
             tuner = Model_Tuner(self.file_object,self.logger_object)
-            self.trained_models_dict = {'svm':None,'rf':None,'xg':None,'bnb':None}
+            self.trained_models_dict = {'svm':None,'rf':None,'xg':None,'mnb':None}
 
             for m in self.models_list:
                 if m == 'svm':
-                    self.trained_models_dict['nb'] = tuner.get_params_svm(x_train,y_train)
+                    self.trained_models_dict['svm'] = tuner.get_params_svm(x_train,y_train)
                 elif m == 'rf':
                     self.trained_models_dict['rf'] = tuner.get_params_for_RandomForest(x_train,y_train)
                 elif m == 'xg':
                     self.trained_models_dict['xg'] = tuner.get_best_params_for_XGBoost(x_train,y_train)
-                elif m == 'bnb':
-                    self.trained_models_dict['bnb'] = tuner.get_params_bagging_naive_bayes(x_train,y_train)
+                elif m == 'mnb':
+                    self.trained_models_dict['mnb'] = tuner.get_params_bagging_naive_bayes(x_train,y_train)
                 else:
                     pass
 

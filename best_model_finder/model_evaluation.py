@@ -16,21 +16,21 @@ class Model_Evaluation:
                    'f1_score': 0},
             'xg': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
                    'f1_score': 0},
-            'bnb': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
+            'mnb': {'accuracy_score': None, 'confusion_matrix': None, 'precision_score': None, 'recall_score': None,
                     'f1_score': 0}
         }
 
 
     def get_accuracy_score(self,model):
         file = open('Training_Logs/General_Log.txt', 'a+')
-        self.logger_object.log(file,'Entered get_accuracy_score() method for '+ str(model) + ' of Model_Tuner class of best_model_finder package')
+        self.logger_object.log(file,'Entered get_accuracy_score() method for '+ str(model) + ' of Model_Evaluation class of best_model_finder package')
         file.close()
 
         try:
             y_predict = model.predict(self.x_test)
             acc_score = accuracy_score(self.y_test,y_predict)
             file = open('Training_Logs/General_Log.txt', 'a+')
-            self.logger_object.log(file,'Successfully Executed get_accuracy_score() for' +str(model)+ ' method of Model_Tuner class of best_model_finder package')
+            self.logger_object.log(file,'Successfully Executed get_accuracy_score() for' +str(model)+ ' method of Model_Evaluation class of best_model_finder package')
             file.close()
             return acc_score
         except Exception as e:
@@ -48,7 +48,7 @@ class Model_Evaluation:
             cfn_matrix = confusion_matrix(self.y_test, y_predict)
             file = open('Training_Logs/General_Log.txt', 'a+')
             self.logger_object.log(file, 'Successfully Executed get_confusion_matrix() for' + str(
-                model) + ' method of Model_Finder class of best_model_finder package')
+                model) + ' method of Model_Evaluation class of best_model_finder package')
             file.close()
             return cfn_matrix
         except Exception as e:
@@ -65,7 +65,7 @@ class Model_Evaluation:
             y_predict = model.predict(self.x_test)
             prec_score = precision_score(self.y_test,y_predict,average='micro')
             file = open('Training_Logs/General_Log.txt', 'a+')
-            self.logger_object.log(file,'Successfully Executed get_precision_score() for ' +str(model)+ ' method of Model_Tuner class of best_model_finder package')
+            self.logger_object.log(file,'Successfully Executed get_precision_score() for ' +str(model)+ ' method of Model_Finder class of best_model_finder package')
             file.close()
             return prec_score
         except Exception as e:

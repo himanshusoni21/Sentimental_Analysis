@@ -7,6 +7,7 @@ from training_validation_insertion import Train_Validation
 from prediction_validation_insertion import Predict_Validation
 from train_model import Training_Model
 from predict_model import Predict_From_Model
+import pandas as pd
 import shutil
 
 os.putenv('LANG', 'en_US.UTF-8')
@@ -19,7 +20,22 @@ CORS(application)
 @application.route("/",methods=['GET'])
 @cross_origin()
 def home():
-    return render_template('index.html')
+    already_exist = None
+    if os.path.exists('models'):
+        file = os.listdir('models')
+        if 'SupportVectorMachine' in file:
+            exist = 'svm'
+        elif 'RandomForest' in file:
+            exist = 'rf'
+        elif 'XGBoost' in file:
+            exist = 'xg'
+        elif 'BaggingMultinomialNB' in file:
+            exist = 'mnb'
+        else:
+            exist = 'none'
+        already_exist = {'model':exist}
+
+    return render_template('index.html',already_exist = already_exist)
 
 @application.route("/trainModel",methods=['POST'])
 @cross_origin()
@@ -29,17 +45,56 @@ def trainModelRoute():
             try:
                 if request.form is not None:
                     if request.form['model_list[]'] is not None and request.form['sampler'] is not None:
+
+                        if os.path.exists('Training_Logs'):
+                            file = os.listdir('Training_Logs')
+                            if not len(file) == 0:
+                                for f in file:
+                                    os.remove('Training_Logs/' + f)
+                        else:
+                            pass
+
+                        if os.path.exists('Training_Raw_Validated_File/Bad_Raw/'):
+                            file = os.listdir('Training_Raw_Validated_File/Bad_Raw/')
+                            if not len(file) == 0:
+                                for f in file:
+                                    os.remove('Training_Raw_Validated_File/Bad_Raw/' + f)
+                        else:
+                            pass
+
+                        if os.path.exists('Training_Raw_Validated_File/Good_Raw/'):
+                            file = os.listdir('Training_Raw_Validated_File/Good_Raw/')
+                            if not len(file) == 0:
+                                for f in file:
+                                    os.remove('Training_Raw_Validated_File/Good_Raw/' + f)
+                        else:
+                            pass
+
+                        if os.path.exists('TrainingFileFrom_DB'):
+                            file = os.listdir('TrainingFileFrom_DB')
+                            if not len(file) == 0:
+                                for f in file:
+                                    os.remove('TrainingFileFrom_DB/' + f)
+                        else:
+                            pass
+
                         model_list = request.form.getlist('model_list[]')
                         sampling = request.form['sampler']
                         training_batch_file_path = 'Training_Batch_Files/'
-
+                        print(model_list)
                         trainValidation_obj = Train_Validation(training_batch_file_path)
                         trainValidation_obj.training_validation()
-                        print(type(sampling))
                         trainModel_obj = Training_Model(model_list,sampling)
                         is_training_success = trainModel_obj.train_model()
                         if (is_training_success == 'success'):
-                            return Response('Training Successfully Completed !!!')
+                            if 'svm' in model_list:
+                                return Response('Support Vector Machine Model Trained !!!')
+                            elif 'rf' in model_list:
+                                return Response('Random Forest Model Trained !!!')
+                            elif 'xg' in model_list:
+                                return Response('XGBoost Model Trained !!!')
+                            elif 'mnb' in model_list:
+                                return Response('Bagging MultinomialNB Model Trained !!!')
             except ValueError:
                 print(str(ValueError))
                 return Response('Error Occured! %s' % str(ValueError))
@@ -53,6 +108,26 @@ def trainModelRoute():
         print(e)
         raise e
 
+@application.route("/dumpModel",methods=['POST'])
+@cross_origin()
+def dumpModelRoute():
+    try:
+        if request.method == 'POST':
+            if request.form is not None:
+                will_dump = request.form['dump_model']
+                print(will_dump)
+                if will_dump == '1':
+                    if os.path.exists('models'):
+                        file = os.listdir('models')
+                        if not len(file) == 0:
+                            for f in file:
+                                shutil.rmtree('models/' + f)
+                    else:
+                        pass
+        return Response('dumped')
+    except Exception as e:
+        print(e)
+        raise e
 
 @application.route("/predictBatch",methods=['POST'])
 @cross_origin()
@@ -122,14 +197,18 @@ def predictBatchRoute():
 
 @application.route("/predictRow",methods=['POST'])
 @cross_origin()
-def predictBatchRoute():
+def predictRowRoute():
     try:
         if request.method == 'POST':
             try:
                 if request.form is not None:
                     if request.form['comment'] is not None:
-                        comment = request.form['comment']
-
+                        comment = list()
+                        comment.append(request.form['comment'])
+                        prediction_obj = Predict_From_Model()
+                        data = pd.DataFrame({'comment':comment})
+                        response = prediction_obj.row_predict_model(data)
+                        return Response(response)
             except Exception as e:
                 raise e
     except Exception as e:

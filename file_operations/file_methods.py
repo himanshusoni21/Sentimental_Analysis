@@ -13,14 +13,14 @@ class File_Operation:
         self.logger_object.log(file,'Entered save_model() method of file_operations class of file_operations package')
         full_filename = None
         try:
-            if filename == 'nb':
-                full_filename = 'GaussianNB'
+            if filename == 'svm':
+                full_filename = 'SupportVectorMachine'
             elif filename == 'rf':
                 full_filename = 'RandomForest'
             elif filename == 'xg':
                 full_filename = 'XGBoost'
-            elif filename == 'nbn':
-                full_filename = 'BaggingGaussianNB'
+            elif filename == 'mnb':
+                full_filename = 'BaggingMultinomialNB'
 
             path = os.path.join(self.model_directory,full_filename)
             if os.path.isdir(path):

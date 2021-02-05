@@ -163,9 +163,9 @@
 							<div class="form-group files color">
 								<label class="label_heading">Select Model for Training :</label><br>
 								<input type="checkbox" class="model_cb" name="model_list[]" checked id="svm" value="svm">&nbsp;Support Vector Machine &nbsp;&nbsp;&nbsp;
-								<input type="checkbox" class="model_cb" name="model_list[]" id="rf" value="rf">&nbsp;Random Forest &nbsp;&nbsp;&nbsp;
-								<input type="checkbox" class="model_cb" name="model_list[]" id="xg" value="xg">&nbsp;XGBoost <br>
-								<input type="checkbox" class="model_cb" name="model_list[]" id="bnb" value="bnb">&nbsp;Bagging + Naive Bayes
+								<input type="checkbox" class="model_cb" name="model_list[]" id="rf" value="rf">&nbsp;Random Forest &nbsp;&nbsp;&nbsp;<br>
+								<input type="checkbox" class="model_cb" name="model_list[]" id="xg" value="xg">&nbsp;XGBoost
+								<input type="checkbox" class="model_cb" name="model_list[]" id="mnb" value="mnb">&nbsp;Bagging + Naive Bayes
 							</div>
 
 							<div class="form-group files color">
@@ -180,21 +180,22 @@
 							</div>
 
 							<div class="form-group files color">
-								<input type="button" class="form-control btn btn-warning" value="Dump Existed Model">
+								<input type="button" id="dumpmodel" name="dumpmodel" class="form-control btn btn-warning" value="Dump Existed Model">
 							</div>
+
+							<label id="trained_model"></label>
 						</div>
 					</form>
 					<br>
 					<br>
 					<div class="boxes">
-						<label id="is_trained"></label>
-						<label class="label_heading">Model Evaluation Report</label>
+<!--						<label class="label_heading">Model Evaluation Report</label>-->
 						<button class="btn btn-warning">Download Evaluation Report as PDF</button>
 					</div>
 				</div>
 				<div class="res-container  col-md-6 col-xs-12">
 					<div class="boxes shadow rounded-lg">
-						<label class="label_heading"><u>Batch Prediction Section</u></label>
+						<label class="label_heading"><u>Bulk Batch Prediction Section</u></label>
 						<form id="upload-batchfile" method="post" enctype="multipart/form-data">
 							<input name="batchfile[]" id="batchfile" type="file" accept=".csv,.xls,.xlsx" multiple class="btn btn-primary">
 							<br><br>
@@ -214,7 +215,7 @@
 					</div>
 					<br>
 					<div class="result-box shadow rounded-lg">
-						<h6 class="title"><u>Results Section</u></h6>
+						<h6 class="title"><u>Result's Section</u></h6>
 						<div class="json-result">
 							
 
@@ -250,6 +251,31 @@
 				});
 			});
 
+			var data = JSON.parse('{{ already_exist | tojson | safe }}');
+			var model = String(data.model);
+			if (model == "svm"){
+				$('#training').prop('disabled',false);
+				$('#trained_model').html('<p>Support Vector Machine Model already Trained !!! </p>');
+			}
+			if (model == "rf"){
+				$('#training').prop('disabled',true);
+				$('#trained_model').html('<p>Random Forest Model already Trained !!! </p>');
+			}
+			else if (model == "xg"){
+				$('#training').prop('disabled',true);
+				$('#trained_model').html('<p>XGBoost Model already Trained !!! </p>');
+			}
+			else if (model == "mnb"){
+				$('#training').prop('disabled',true);
+				$('#trained_model').html('<p>Bagging + MultinomialNB Model already Trained !!! </p>');
+			}
+			else if (model == "none"){
+				$('#training').prop('disabled',false);
+				$('#trained_model').html('<p>None Model Trained</p>');
+				$('#dumpmodel').prop('disabled',true);
+			}
+
+
 			$("#training").click(function(e){
 				e.preventDefault();
 				$('#loading').show();
@@ -264,8 +290,8 @@
 				if($('#xg').is(':checked')){
 					model_arr.push($('#xg').val());
 				}
-				if($('#bnb').is(':checked')){
-					model_arr.push($('#bnb').val());
+				if($('#mnb').is(':checked')){
+					model_arr.push($('#mnb').val());
 				}
 				console.log(model_arr);
 
@@ -286,7 +312,25 @@
 					type : "POST",
 					data: {model_list:model_arr,sampler:sampling},
 					success: function(response){
-						$("#is_trained").html(response);
+						$("#trained_model").html(response);
+						$('#training').prop('disabled',true);
+						$('#dumpmodel').prop('disabled',false);
+						$('#loading').hide();
+					}
+				});
+			});
+
+			$("#dumpmodel").click(function(e){
+				e.preventDefault();
+				$('#loading').show();
+				$.ajax({
+					url : "/dumpModel",
+					type : "POST",
+					data : {dump_model:'1'},
+					success : function(response){
+						$('#training').prop('disabled',false);
+						$('#dumpmodel').prop('disabled',true);
+						$('#trained_model').html('<p>Model Dumped Successfully !!! None Model Exist</p>');
 						$('#loading').hide();
 					}
 				});
@@ -331,14 +375,12 @@
 					type: "POST",
 					data: {comment:comment},
 					success: function(response){
-						$(".json-result").html("<p>Prediction is:" + response + "</p>");
+						$(".json-result").html("<p>Prediction is: This is " + response + " Comment</p>");
 						$('#loading').hide();
 					}
 				});
-
-
-
 			});
+
 		});
 	</script>
 </body>
