@@ -9,6 +9,7 @@ from train_model import Training_Model
 from predict_model import Predict_From_Model
 import pandas as pd
 import shutil
+from zipfile import ZipFile
 
 os.putenv('LANG', 'en_US.UTF-8')
 os.putenv('LC_ALL', 'en_US.UTF-8')
@@ -214,6 +215,40 @@ def predictRowRoute():
     except Exception as e:
         print(e)
         return Response('Error Occured::%s' % str(e))
+
+
+
+@application.route("/download_prediction",methods=['GET'])
+@cross_origin()
+def download_prediction():
+    try:
+        file_paths = list()
+        list_files = [i for i in os.listdir('Predicted_Files')]
+        for f in list_files:
+            file_paths.append('Predicted_Files/' + f)
+
+        if file_paths is not None:
+            with ZipFile('Prediction_Zip/Prediction.zip','w') as zip:
+                for file in file_paths:
+                    zip.write(file)
+
+            if os.path.exists('Predicted_Files'):
+                file = os.listdir('Predicted_Files')
+                if not len(file) == 0:
+                    for f in file:
+                        os.remove('Predicted_Files/' + f)
+            else:
+                pass
+
+        file = os.listdir('Prediction_Zip')[0]
+        return send_file('Prediction_Zip/' + file, as_attachment=True)
+
+    except Exception as e:
+        print(e)
+        raise e
+
+
+
 
 if __name__ == '__main__':
     host = '0.0.0.0'
